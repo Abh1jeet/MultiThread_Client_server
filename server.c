@@ -6,19 +6,27 @@
 #include <netinet/in.h> 
 #include <string.h> 
 #include<pthread.h>
-
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 #define PORT 8080 
 
 void * socketThread(void *arg)
-{
+{   pthread_mutex_lock(&lock);
   int new_socket = *((int *)arg);
-  char *hello = "Hello from server";
+  char *hello = "Hello from server 1.echo 2.RTT 3.upload";
   int valread; 
   char buffer[1024] = {0}; 
+  
+  //server receive
   valread = read( new_socket , buffer, 1024); 
-  printf("%s\n",buffer ); 
+  printf("%s\n",buffer );
+  
+  //server send
   send(new_socket , hello , strlen(hello) , 0 ); 
   printf("Hello message sent\n"); 
+    pthread_mutex_unlock(&lock);
+sleep(1);
+  close(new_socket);
+
   pthread_exit(NULL);
 }
 

@@ -4,8 +4,11 @@
 #include <sys/socket.h> 
 #include <stdlib.h> 
 #include <netinet/in.h> 
-#include <string.h> 
+#include <string.h>
+#include<pthread.h>
+
 #define PORT 8080 
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 int main(int argc, char const *argv[]) 
 { 
@@ -37,9 +40,14 @@ int main(int argc, char const *argv[])
 		printf("\nConnection Failed \n"); 
 		return -1; 
 	} 
+    pthread_mutex_lock(&lock);
 	send(sock , hello , strlen(hello) , 0 ); 
 	printf("Hello message sent\n"); 
 	valread = read( sock , buffer, 1024); 
 	printf("%s\n",buffer ); 
+    pthread_mutex_unlock(&lock);
+
+     close(sock);
+    
 	return 0; 
 } 
