@@ -102,8 +102,41 @@ fflush(stdin);
    if(option==1)
    {  
        char file[1024] = {0}; 
-     read(client_sock, file, 1024); //reading from the server
-     printf("filePath received %s\n",file);
+    // read(client_sock, file, 1024); //reading from the sender
+    // printf("filePath received %s \n",file);
+//************************************reading entire file**********************
+        int LENGTH=512;
+        char revbuf[LENGTH]; // Receiver buffer
+        char* fr_name = "receive.txt";
+		FILE *fr = fopen(fr_name, "a");
+		if(fr == NULL)
+			printf("File %s Cannot be opened file on server.\n", fr_name);
+		else
+		{
+			bzero(revbuf, LENGTH); 
+			int fr_block_sz = 0;
+			while((fr_block_sz = recv(client_sock, revbuf, LENGTH, 0)) > 0) 
+			{
+			    int write_sz = fwrite(revbuf, sizeof(char), fr_block_sz, fr);
+				
+				bzero(revbuf, LENGTH);
+				if (fr_block_sz == 0 || fr_block_sz != 512) 
+				{
+					break;
+				}
+			}
+			
+			printf("Ok received from client!\n");
+			fclose(fr); 
+		}
+
+
+
+//**********************************************************************************
+
+
+
+
    }
    else
    {
