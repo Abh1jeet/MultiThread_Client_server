@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h> 
 #include <ctype.h>
+#include<time.h>
 #define PORT 8080 
 
 int main(int argc, char *argv[])
@@ -48,10 +49,11 @@ int main(int argc, char *argv[])
     write(sockfd, &convertedOption, sizeof(convertedOption));
     fflush(stdin);
     if(option==1)
-    {      
-   char fs_name[20]; 
-   scanf("%s",fs_name);
-   printf("%s",fs_name);
+    {    
+    //****************************************************Uploading file to server*******************************************      
+        char fs_name[20]; 
+        scanf("%s",fs_name);
+        printf("%s",fs_name);
     //**********************send file path to server****************************
         int LENGTH=512;
         //char* fs_name = "hello.txt";
@@ -90,28 +92,52 @@ int main(int argc, char *argv[])
 
 
 
-
-
-
-
-
-
+    }else if(option ==2)
+    {
+  //****************************************Application layer RTT************************      
     }
+    else if(option ==3)
+    {
+ //*****************************************Echo Request Reply***************************
+    while(1)
+    {
+        char *quit="quit";
+        printf("enter string or press q to quit\n");
+        char message[50];
+        fflush(stdout);  
+        bzero(message,50);         
+        scanf(" %[^\n]%*c", message);
+        //client to server
+        write(sockfd, &message, strlen(message));
+        printf("string passed to server%s\n",message);
+        if(strcmp(message,quit)==0)
+        {
+            break;
+        }
+        //server to cleint
+        bzero(message,50); 
+        read(sockfd, message, 50);
+        printf("string passed by server%s\n",message);
 
-
-        while(1){
+        //client to server
+        write(sockfd, &message, strlen(message));
+        printf("string passed to server%s\n",message);
         
-        printf("\nEnter character: ");
-        scanf(" %c", &ch);
 
-        write(sockfd, &ch, 1); //writing to the server
-        if(ch == 'q' || ch == 'Q'){ /* This if clause was nessecary so that we could */
-            close(sockfd);          /* easily close the server-to-client connection without errors */
-            exit(0);
-      }
-        read(sockfd, &ch, 1); //reading from the server
-        printf("char from server = %c\n", ch);
     }
+
+
+
+
+    }
+    else
+    {
+        printf("Service not available")  ;     
+    }
+
+
+
+        
 
 }
 

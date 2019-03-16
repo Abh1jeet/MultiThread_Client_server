@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h> 
 #include <pthread.h>
+#include<time.h>
 #define PORT 8080 
 void *thread_connection(void *); // Thread function
 int c = 0; // For numbering and keeping track of our clients
@@ -59,7 +60,8 @@ int main(int argc, char *argv[])
         if( pthread_create(&tid, NULL, thread_connection, (void*) &client_sockfd) < 0)
         {                                                 /* Passing the thread is the CLIENT SOCKET */  
             perror("Thread not created");                 /* with which server and client can communicate in thread function */
-            return 1;
+            //return 1;
+            break;
         }
         printf("Thread assigned to client %d \n", c);
     }
@@ -68,6 +70,7 @@ int main(int argc, char *argv[])
     {
         perror("accept falied");
         return 1;
+        //break;
     }
     return 0;        
 }
@@ -98,9 +101,9 @@ void *thread_connection(void *client_sockfd)
     else {
     // Handling erros here
         }
-fflush(stdin);
+//fflush(stdin);
    if(option==1)
-   {  
+   {   clock_t time;  
        char file[1024] = {0}; 
     // read(client_sock, file, 1024); //reading from the sender
     // printf("filePath received %s \n",file);
@@ -109,6 +112,7 @@ fflush(stdin);
         char revbuf[LENGTH]; // Receiver buffer
         char* fr_name = "receive.txt";
 		FILE *fr = fopen(fr_name, "a");
+        time=clock();
 		if(fr == NULL)
 			printf("File %s Cannot be opened file on server.\n", fr_name);
 		else
@@ -124,40 +128,93 @@ fflush(stdin);
 				{
 					break;
 				}
+
 			}
 			
-			printf("Ok received from client!\n");
-			fclose(fr); 
+			time=clock()-time;
+            float times=(float)time/CLOCKS_PER_SEC;
+            printf("Ok received from client! time taken to uplioad=%f \n",times);
+			
+            fclose(fr); 
 		}
 
 
 
 //**********************************************************************************
-
-
-
-
    }
+   else if(option ==2)
+   {
+
+//*************************************Aplication layer RTT**********************************
+  
+   
+   
+   }
+   else if(option ==3)
+   {
+//*************************************ECHO REQUEST*******************************
+float RTT[1000];
+int noOfString=0;
+int strLength=100;
+char string[strLength];
+char *quit="quit";
+    
+while(1)
+  { bzero(string, strLength);  
+   
+   //reading from client
+    read(client_sock, string, strLength);
+    if(strcmp(string,quit)==0)
+    { for(int i=1;i<=noOfString;i++)
+        {printf("%f\n",RTT[i]);}
+        break;
+    }
+    printf("string sent by client %s\n",string);
+   
+   //sending string to client
+   //timer shoud start
+    noOfString++;
+    clock_t time1;  
+    time1=clock();
+    write(client_sock, &string, strlen(string));
+    printf("string sent to client %s\n",string);
+   
+   //reading from client
+    read(client_sock, string, strLength);
+    printf("string sent by client %s\n",string);
+   
+    RTT[noOfString]=(float)(clock()-time1)/CLOCKS_PER_SEC;
+
+
+
+   
+ }
+  
+ }
+
    else
    {
-       printf("pagal hai kya\n");
+
+
+ printf("not available yet \n");
+   
+
    }
 
 
 
-
-    while(1)
-    {
-        read(client_sock, &ch, 1);
-        if (ch == 'Q' || ch == 'q') 
-        {
-            close(client_sock); 
-            break;  
-        }else {
-                ch++;
-                write(client_sock, &ch, 1);
-            }
-    }
+   // while(1)
+    //{
+      //  read(client_sock, &ch, 1);
+        //if (ch == 'Q' || ch == 'q') 
+        //{
+          //  close(client_sock); 
+           // break;  
+        //}else {
+          //      ch++;
+            //    write(client_sock, &ch, 1);
+            //}
+    //}
     printf("\nYou enetered Q, Connection is now closed with client %d\n", c);
     c--; // keeping track of our client
     
