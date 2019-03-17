@@ -52,8 +52,9 @@ int main(int argc, char *argv[])
     {    
     //****************************************************Uploading file to server*******************************************      
         char fs_name[20]; 
+        printf("enter file Path :");
         scanf("%s",fs_name);
-        printf("%s",fs_name);
+       // printf("%s",fs_name);
     //**********************send file path to server****************************
         int LENGTH=512;
         //char* fs_name = "hello.txt";
@@ -76,7 +77,7 @@ int main(int argc, char *argv[])
 		    }
 		    bzero(sdbuf, LENGTH);
 		}
-		printf("Ok File %s from Client was Sent!\n", fs_name);
+		printf("File %s from Client was Sent!\n", fs_name);
    //***********************************************************************************
 
    
@@ -102,14 +103,14 @@ int main(int argc, char *argv[])
     while(1)
     {
         char *quit="quit";
-        printf("enter string or press q to quit\n");
+        printf("enter string or press quit to quit\n");
         char message[50];
         fflush(stdout);  
         bzero(message,50);         
         scanf(" %[^\n]%*c", message);
         //client to server
         write(sockfd, &message, strlen(message));
-        printf("string passed to server%s\n",message);
+        //printf("string passed to server%s\n",message);
         if(strcmp(message,quit)==0)
         {
             break;

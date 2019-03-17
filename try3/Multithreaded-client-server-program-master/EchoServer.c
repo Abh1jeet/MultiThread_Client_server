@@ -110,13 +110,18 @@ void *thread_connection(void *client_sockfd)
 //************************************reading entire file**********************
         int LENGTH=512;
         char revbuf[LENGTH]; // Receiver buffer
-        char* fr_name = "receive.txt";
-		FILE *fr = fopen(fr_name, "a");
+        //creating file name
         time=clock();
+        int ft=(int)time;
+		char fr_name[30];
+        sprintf(fr_name, "%d_received_%d", c,ft);
+        FILE *fr = fopen(fr_name, "a");
 		if(fr == NULL)
 			printf("File %s Cannot be opened file on server.\n", fr_name);
 		else
-		{
+		{   
+        
+
 			bzero(revbuf, LENGTH); 
 			int fr_block_sz = 0;
 			while((fr_block_sz = recv(client_sock, revbuf, LENGTH, 0)) > 0) 
@@ -133,7 +138,7 @@ void *thread_connection(void *client_sockfd)
 			
 			time=clock()-time;
             float times=(float)time/CLOCKS_PER_SEC;
-            printf("Ok received from client! time taken to uplioad=%f \n",times);
+            printf("File uploaded time taken=%f \n",times);
 			
             fclose(fr); 
 		}
@@ -166,10 +171,10 @@ while(1)
     read(client_sock, string, strLength);
     if(strcmp(string,quit)==0)
     { for(int i=1;i<=noOfString;i++)
-        {printf("%f\n",RTT[i]);}
+        {printf("Time Taken in Round %d =%f\n",i,RTT[i]);}
         break;
     }
-    printf("string sent by client %s\n",string);
+   // printf("string sent by client %s\n",string);
    
    //sending string to client
    //timer shoud start
@@ -181,9 +186,10 @@ while(1)
    
    //reading from client
     read(client_sock, string, strLength);
-    printf("string sent by client %s\n",string);
-   
     RTT[noOfString]=(float)(clock()-time1)/CLOCKS_PER_SEC;
+    printf("string sent by client %s\n",string);
+   printf("round complete\n");
+    
 
 
 
