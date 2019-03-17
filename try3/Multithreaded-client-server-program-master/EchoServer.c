@@ -102,7 +102,7 @@ void *thread_connection(void *client_sockfd)
     // Handling erros here
         }
 //fflush(stdin);
-   if(option==1)
+   if(option==3)
    {   clock_t time;  
        char file[1024] = {0}; 
     // read(client_sock, file, 1024); //reading from the sender
@@ -138,8 +138,12 @@ void *thread_connection(void *client_sockfd)
 			
 			time=clock()-time;
             float times=(float)time/CLOCKS_PER_SEC;
-            printf("File uploaded time taken=%f \n",times);
+           // printf("File uploaded time taken=%f \n",times);
 			
+            //sending time to client
+            float x=times;
+            send(client_sock, &x, sizeof(float),0);
+   
             fclose(fr); 
 		}
 
@@ -155,7 +159,7 @@ void *thread_connection(void *client_sockfd)
    
    
    }
-   else if(option ==3)
+   else if(option ==1)
    {
 //*************************************ECHO REQUEST*******************************
 float RTT[1000];
@@ -170,8 +174,8 @@ while(1)
    //reading from client
     read(client_sock, string, strLength);
     if(strcmp(string,quit)==0)
-    { for(int i=1;i<=noOfString;i++)
-        {printf("Time Taken in Round %d =%f\n",i,RTT[i]);}
+    { //for(int i=1;i<=noOfString;i++)
+        //{printf("Time Taken in Round %d =%f\n",i,RTT[i]);}
         break;
     }
    // printf("string sent by client %s\n",string);
@@ -190,9 +194,9 @@ while(1)
     printf("string sent by client %s\n",string);
    printf("round complete\n");
     
-
-
-
+    //sending time to client
+    float x=RTT[noOfString];
+    send(client_sock, &x, sizeof(float),0);
    
  }
   

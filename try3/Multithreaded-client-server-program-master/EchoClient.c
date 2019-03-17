@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     int convertedOption= htonl(option);
     write(sockfd, &convertedOption, sizeof(convertedOption));
     fflush(stdin);
-    if(option==1)
+    if(option==3)
     {    
     //****************************************************Uploading file to server*******************************************      
         char fs_name[20]; 
@@ -78,6 +78,11 @@ int main(int argc, char *argv[])
 		    bzero(sdbuf, LENGTH);
 		}
 		printf("File %s from Client was Sent!\n", fs_name);
+        
+        //server to client ..... sending time
+        float x;
+        recv(sockfd, &x, sizeof(float),0);
+        printf("File uploaded time taken=%f \n",x);
    //***********************************************************************************
 
    
@@ -97,11 +102,14 @@ int main(int argc, char *argv[])
     {
   //****************************************Application layer RTT************************      
     }
-    else if(option ==3)
+    else if(option ==1)
     {
+        float RTT[1000];
+        int noOfString=0;
+
  //*****************************************Echo Request Reply***************************
     while(1)
-    {
+    { 
         char *quit="quit";
         printf("enter string or press quit to quit\n");
         char message[50];
@@ -113,8 +121,12 @@ int main(int argc, char *argv[])
         //printf("string passed to server%s\n",message);
         if(strcmp(message,quit)==0)
         {
+
+           for(int i=1;i<=noOfString;i++)
+             {printf("Time Taken in Round %d =%f\n",i,RTT[i]);}
             break;
         }
+        noOfString++;
         //server to cleint
         bzero(message,50); 
         read(sockfd, message, 50);
@@ -124,7 +136,10 @@ int main(int argc, char *argv[])
         write(sockfd, &message, strlen(message));
         printf("string passed to server%s\n",message);
         
-
+        //server to client ..... sending time
+        float x;
+        recv(sockfd, &x, sizeof(float),0);
+        RTT[noOfString]=x;
     }
 
 
