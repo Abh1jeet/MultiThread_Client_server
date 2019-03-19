@@ -12,24 +12,6 @@
 #include<time.h>
 #define PORT 8080 
 
-void scanFromUser()
-{
-
-}
-void printToUser()
-{
-
-}
-void readFromServer()
-{
-
-
-}
-void writeToServer()
-{
-
-}
-
 
 
 
@@ -112,7 +94,7 @@ int main(int argc, char *argv[])
          fflush(stdout);  
         bzero(message,50); 
         read(sockfd, message, 50);
-        printf("string passed by server%s\n",message);
+       // printf("string passed by server%s\n",message);
 
 
     }
@@ -121,7 +103,7 @@ int main(int argc, char *argv[])
         //write string to server
 
         write(sockfd, &message, strlen(message));
-        printf("string passed to server%s\n",message);
+       // printf("string passed to server%s\n",message);
          bzero(message,50); 
         
     }

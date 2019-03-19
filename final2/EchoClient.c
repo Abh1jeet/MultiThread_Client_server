@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     struct sockaddr_in address;
     int result;
     char ch;
-
+    int iterations=1;
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
     address.sin_family = AF_INET;
@@ -100,11 +100,42 @@ int main(int argc, char *argv[])
 
     }else if(option ==2)
     {
+  
   //****************************************Application layer RTT************************      
-  
-  
-  
-  
+    char message[50];
+    int iteration,messageSize;
+    //scan integer from user
+    scanf("%d",&messageSize);
+    //sending integer input to server
+    int z= htonl(messageSize);
+    write(sockfd, &z, sizeof(z));
+    fflush(stdin);
+
+    scanf("%d",&iteration);
+    //sending integer input to server
+    iteration=iterations;
+    int y= htonl(iteration);
+    write(sockfd, &y, sizeof(y));
+    fflush(stdin);
+    
+    for(int i=0;i<iteration;i++)
+    {
+
+        bzero(message,50); 
+       
+        read(sockfd, message, 50);
+
+        //client to server
+        write(sockfd, &message, strlen(message));
+        
+
+    }
+
+    //reading float
+    //server to client ..... sending time
+        float x;
+        recv(sockfd, &x, sizeof(float),0);
+        printf("time taken :%f\n",x);
     }
     else if(option ==1)
     {
@@ -112,6 +143,7 @@ int main(int argc, char *argv[])
         int noOfString=0;
 
  //*****************************************Echo Request Reply***************************
+   
     while(1)
     { 
         char *quit="quit";

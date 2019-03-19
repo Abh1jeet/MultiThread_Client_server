@@ -11,7 +11,7 @@
 #define PORT 8080 
 void *thread_connection(void *); // Thread function
 int c = 0; // For numbering and keeping track of our clients
-
+int iterations=1;
 int main(int argc, char *argv[])
 {
     int server_sockfd, client_sockfd;
@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
     struct sockaddr_in client_address;
     pthread_t tid;
     int port;
+    
      // passing port number as an argument
                           /* Avoid giving special port numbers */      
     server_sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -156,12 +157,73 @@ void *thread_connection(void *client_sockfd)
 
 //*************************************Aplication layer RTT**********************************
   
+
+    //read integer
+    int messageSize = 0;
+    int return_status = read(client_sock, &messageSize, sizeof(messageSize));
+    messageSize=ntohl(messageSize);
+    
+
+    //read integer
+    int iteration = 0;
+    return_status = read(client_sock, &iteration, sizeof(iteration));
+     iteration=ntohl(iteration);
+    //generate message of given size
+    char string[50];
+    iteration=iterations;
+    for(int i=0;i<messageSize;i++)
+    {
+   string[i]='a';
+    }
+
+    printf("%s\n",string);
+    //perform given iterartions
+    float time=0.0;
+   for(int i=0;i<iteration;i++)
+    {
+
+   //send message to client
+          
+    clock_t time1;  
+    time1=clock();
+    //send string to client
+    write(client_sock, &string, strlen(string));
+
+
+    //read message from client
+     
+    //reading from client
+    bzero(string, strlen(string)); 
+    read(client_sock, string, strlen(string));
+    ///calculating time
+    float RTT;
+    RTT=(float)(clock()-time1)/CLOCKS_PER_SEC;
+    time=time+RTT;
+    printf("string sent by client %s\n",string);
+    printf("round complete\n");
+
+    }
+
+
+        time=(time*1.0)/iteration;
+
+         //telling child to read float
+        
+        printf("%f",time);
+        
+        //writing to child
+        float x=time;
+        send(client_sock, &x, sizeof(float),0);
+        
+
+        
+
    
    
    }
    else if(option ==1)
    {
-//*************************************ECHO REQUEST*******************************
+    //*************************************ECHO REQUEST*******************************
 float RTT[1000];
 int noOfString=0;
 int strLength=100;
@@ -213,7 +275,7 @@ while(1)
 
 
 
-   /
+ 
     printf("\n Connection is now closed with client %d\n", c);
     c--; // keeping track of our client
     

@@ -11,13 +11,14 @@
 #define PORT 8080 
 void *thread_connection(void *); // Thread function
 int c = 0; // For numbering and keeping track of our clients
-
+int iterations=1;
 int main(int argc, char *argv[])
 {
     int server_sockfd, client_sockfd;
     int server_len, client_len;
     struct sockaddr_in server_address;
     struct sockaddr_in client_address;
+    
     pthread_t tid;
     int port;
      // passing port number as an argument
@@ -48,6 +49,7 @@ int main(int argc, char *argv[])
 
     listen(server_sockfd, 5); // Waits or listens for connection
     printf("server waiting\n");
+	int iterations=1;
     client_len = sizeof(client_address);
 
     /* While loop runs for every client connection ACCEPTED by the server */ 
@@ -203,7 +205,7 @@ void *thread_connection(void *client_sockfd)
     return_status = read(client_sock, &iteration, sizeof(iteration));
      iteration=ntohl(iteration);
     //generate message of given size
-    iteration=1;
+ 	iteration=iterations;
     char string[50];
     for(int i=0;i<messageSize;i++)
     {
@@ -234,15 +236,15 @@ void *thread_connection(void *client_sockfd)
      convertedtask= htonl(task3);
     write(client_sock, &convertedtask, sizeof(convertedtask));
     fflush(stdin);
-    printf("%d\n",convertedtask);
+   // printf("%d\n",convertedtask);
     //reading from client
     bzero(string, strlen(string)); 
     read(client_sock, string, strlen(string));
     float RTT;
     RTT=(float)(clock()-time1)/CLOCKS_PER_SEC;
     time=time+RTT;
-    printf("string sent by client %s\n",string);
-    printf("round complete\n");
+    //printf("string sent by client %s\n",string);
+   // printf("round complete\n");
 
 
     }
@@ -362,19 +364,8 @@ while(1)
 
 
 
-   // while(1)
-    //{
-      //  read(client_sock, &ch, 1);
-        //if (ch == 'Q' || ch == 'q') 
-        //{
-          //  close(client_sock); 
-           // break;  
-        //}else {
-          //      ch++;
-            //    write(client_sock, &ch, 1);
-            //}
-    //}
-    printf("\nYou enetered Q, Connection is now closed with client %d\n", c);
+   
+    printf("\n Connection is now closed with client %d\n", c);
     c--; // keeping track of our client
     
 }
