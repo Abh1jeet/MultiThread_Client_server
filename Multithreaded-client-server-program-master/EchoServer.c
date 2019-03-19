@@ -81,9 +81,10 @@ void *thread_connection(void *client_sockfd)
     /* Converting client_sockfd back to integer type and assigning it to client_sock */
     int client_sock = *(int*)client_sockfd;
     /* Now using client_scok for server-to-client communication */
-
+    int task1=1,task2=2,task3=3,task4=4,task5=5,task6=6,task7=7,task8=8;
+   
    //server sending menu
-   char *menu = "1.echo 2.RTT 3.upload";
+    char *menu = "1.echo 2.RTT 3.upload";
     send(client_sock , menu , strlen(menu) , 0 ); 
     
    //server receiving option from client
@@ -107,7 +108,18 @@ void *thread_connection(void *client_sockfd)
        char file[1024] = {0}; 
     // read(client_sock, file, 1024); //reading from the sender
     // printf("filePath received %s \n",file);
+    
 //************************************reading entire file**********************
+        
+       int convertedtask= htonl(task1);
+        write(client_sock, &convertedtask, sizeof(convertedtask));
+        fflush(stdin);
+        read(client_sock, file, 1024);
+        
+        convertedtask= htonl(task8);
+        write(client_sock, &convertedtask, sizeof(convertedtask));
+        fflush(stdin);
+
         int LENGTH=512;
         char revbuf[LENGTH]; // Receiver buffer
         //creating file name
@@ -141,13 +153,29 @@ void *thread_connection(void *client_sockfd)
            // printf("File uploaded time taken=%f \n",times);
 			
             //sending time to client
-            float x=times;
-            send(client_sock, &x, sizeof(float),0);
+           
    
-            fclose(fr); 
-		}
+           
 
+         //telling child to read float
+        printf("%f",times);
+        convertedtask= htonl(task4);
+        write(client_sock, &convertedtask, sizeof(convertedtask));
+        fflush(stdin);
+        //writing to child
+        float x=times;
+        send(client_sock, &x, sizeof(float),0);
+        //telling child to print float
+        convertedtask= htonl(task5);
+        write(client_sock, &convertedtask, sizeof(convertedtask));
+        fflush(stdin);
 
+         fclose(fr); 
+         //tell client to quit
+        convertedtask= htonl(task6);
+        write(client_sock, &convertedtask, sizeof(convertedtask));
+        fflush(stdin);
+        }
 
 //**********************************************************************************
    }
@@ -156,8 +184,91 @@ void *thread_connection(void *client_sockfd)
 
 //*************************************Aplication layer RTT**********************************
   
-   
-   
+    //tell client to take integer input
+     int convertedtask= htonl(task7);
+    write(client_sock, &convertedtask, sizeof(convertedtask));
+    fflush(stdin);
+
+    //read integer
+    int messageSize = 0;
+    int return_status = read(client_sock, &messageSize, sizeof(messageSize));
+    messageSize=ntohl(messageSize);
+    //tell client to take integer input
+     convertedtask= htonl(task7);
+    write(client_sock, &convertedtask, sizeof(convertedtask));
+    fflush(stdin);
+
+    //read integer
+    int iteration = 0;
+    return_status = read(client_sock, &iteration, sizeof(iteration));
+     iteration=ntohl(iteration);
+    //generate message of given size
+    iteration=1;
+    char string[50];
+    for(int i=0;i<messageSize;i++)
+    {
+   string[i]='a';
+    }
+
+    printf("%s\n",string);
+    //perform given iterartions
+    float time=0.0;
+   for(int i=0;i<iteration;i++)
+    {
+
+   //send message to client
+    //tell client to read string server 
+    convertedtask= htonl(task2);
+    write(client_sock, &convertedtask, sizeof(convertedtask));
+   fflush(stdin);
+    
+    clock_t time1;  
+    time1=clock();
+    //send string to client
+    write(client_sock, &string, strlen(string));
+   // printf("string sent to client %s\n",string);
+
+
+    //read message from client
+     //tell client to write string to server
+     convertedtask= htonl(task3);
+    write(client_sock, &convertedtask, sizeof(convertedtask));
+    fflush(stdin);
+    printf("%d\n",convertedtask);
+    //reading from client
+    bzero(string, strlen(string)); 
+    read(client_sock, string, strlen(string));
+    float RTT;
+    RTT=(float)(clock()-time1)/CLOCKS_PER_SEC;
+    time=time+RTT;
+    printf("string sent by client %s\n",string);
+    printf("round complete\n");
+
+
+    }
+
+
+        time=(time*1.0)/iteration;
+         //telling child to read float
+        printf("%f",time);
+        convertedtask= htonl(task4);
+        write(client_sock, &convertedtask, sizeof(convertedtask));
+        fflush(stdin);
+        //writing to child
+        float x=time;
+        send(client_sock, &x, sizeof(float),0);
+        //telling child to print float
+        convertedtask= htonl(task5);
+        write(client_sock, &convertedtask, sizeof(convertedtask));
+        fflush(stdin);
+
+        
+         //tell client to quit
+        convertedtask= htonl(task6);
+        write(client_sock, &convertedtask, sizeof(convertedtask));
+        fflush(stdin);
+
+
    }
    else if(option ==1)
    {
@@ -170,33 +281,71 @@ char *quit="quit";
     
 while(1)
   { bzero(string, strLength);  
-   
+
+    //tell client to take input from user
+    int convertedtask= htonl(task1);
+    write(client_sock, &convertedtask, sizeof(convertedtask));
+    fflush(stdin);
+
    //reading from client
     read(client_sock, string, strLength);
+
+
     if(strcmp(string,quit)==0)
-    { //for(int i=1;i<=noOfString;i++)
-        //{printf("Time Taken in Round %d =%f\n",i,RTT[i]);}
+    { for(int i=1;i<=noOfString;i++)
+        {printf("Time Taken in Round %d =%f\n",i,RTT[i]);
+        
+        //sending time to client
+        
+        //telling child to read float
+        convertedtask= htonl(task4);
+        write(client_sock, &convertedtask, sizeof(convertedtask));
+        fflush(stdin);
+        //writing to child
+        float x=RTT[i];
+        send(client_sock, &x, sizeof(float),0);
+        //telling child to print float
+        convertedtask= htonl(task5);
+        write(client_sock, &convertedtask, sizeof(convertedtask));
+        fflush(stdin);
+
+        }
+        //tell client to quit
+        convertedtask= htonl(task6);
+        write(client_sock, &convertedtask, sizeof(convertedtask));
+        fflush(stdin);
+
         break;
     }
-   // printf("string sent by client %s\n",string);
-   
+     
    //sending string to client
    //timer shoud start
+
+    //tell client to read string server 
+    convertedtask= htonl(task2);
+    write(client_sock, &convertedtask, sizeof(convertedtask));
+    fflush(stdin);
+
     noOfString++;
     clock_t time1;  
     time1=clock();
+    //send string to client
     write(client_sock, &string, strlen(string));
     printf("string sent to client %s\n",string);
    
    //reading from client
+    //tell client to write string to server
+     convertedtask= htonl(task3);
+    write(client_sock, &convertedtask, sizeof(convertedtask));
+    fflush(stdin);
+    //reading from client
     read(client_sock, string, strLength);
     RTT[noOfString]=(float)(clock()-time1)/CLOCKS_PER_SEC;
     printf("string sent by client %s\n",string);
-   printf("round complete\n");
+    printf("round complete\n");
     
-    //sending time to client
-    float x=RTT[noOfString];
-    send(client_sock, &x, sizeof(float),0);
+   
+   
    
  }
   
